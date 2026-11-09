@@ -1,0 +1,32 @@
+{
+  "up": {
+    "srcW": 37,
+    "srcH": 23,
+    "dstW": 101,
+    "dstH": 61
+  },
+  "down": {
+    "srcW": 101,
+    "srcH": 61,
+    "dstW": 40,
+    "dstH": 27
+  },
+  "down4": {
+    "srcW": 96,
+    "srcH": 64,
+    "dstW": 24,
+    "dstH": 16
+  },
+  "same": {
+    "srcW": 30,
+    "srcH": 20,
+    "dstW": 30,
+    "dstH": 20
+  },
+  "mixed": {
+    "srcW": 50,
+    "srcH": 40,
+    "dstW": 120,
+    "dstH": 17
+  }
+}

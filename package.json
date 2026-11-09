@@ -1,0 +1,15 @@
+{
+  "name": "foto4k",
+  "version": "1.0.0",
+  "description": "Mejora y amplía fotos a 4K con IA directamente en el navegador. Gratis, privado y sin servidor.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

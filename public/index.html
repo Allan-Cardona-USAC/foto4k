@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Foto4K: amplía tus fotos a 4K con IA, gratis y privado</title>
+    <meta
+      name="description"
+      content="Mejora y amplía tus fotos a 4K con inteligencia artificial directamente en tu navegador. Gratis, sin registro y sin subir tus fotos a ningún servidor."
+    />
+    <meta property="og:title" content="Foto4K: amplía tus fotos a 4K sin perder nada" />
+    <meta
+      property="og:description"
+      content="La IA trabaja en tu propio dispositivo. Tus fotos nunca se suben a internet."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#34363a" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body data-phase="empty">
+    <header class="topbar">
+      <a class="wordmark" href="./" aria-label="Foto4K, inicio">Foto<span>4K</span></a>
+      <nav aria-label="Secciones">
+        <a href="#como-funciona">Cómo funciona</a>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <div class="heading">
+        <h1>Amplía tus fotos a 4K sin perder nada</h1>
+        <p class="lede">
+          La inteligencia artificial trabaja en tu propio dispositivo: tu foto nunca se sube a internet. Gratis y sin
+          registro.
+        </p>
+      </div>
+
+      <section class="stage" id="stage" aria-label="Tu foto" data-phase="empty">
+        <!-- Vacío: zona para soltar la foto -->
+        <div class="dropzone" id="dropzone">
+          <span class="crop crop-tl" aria-hidden="true"></span>
+          <span class="crop crop-tr" aria-hidden="true"></span>
+          <span class="crop crop-bl" aria-hidden="true"></span>
+          <span class="crop crop-br" aria-hidden="true"></span>
+          <p class="drop-title">Suelta tu foto aquí</p>
+          <button type="button" class="button secondary" id="pick">Elegir una foto</button>
+          <p class="drop-hint">JPG, PNG, WebP o AVIF. También puedes pegarla con Ctrl + V.</p>
+          <input type="file" id="file" accept="image/*" hidden />
+        </div>
+
+        <!-- Con foto: marco con cotas de tamaño -->
+        <figure class="frame" id="frame" hidden>
+          <div class="cota cota-x" aria-hidden="true"><span id="cota-x"></span></div>
+          <div class="cota cota-y" aria-hidden="true"><span id="cota-y"></span></div>
+
+          <div class="viewport" id="viewport">
+            <img id="preview" alt="Tu foto original" draggable="false" />
+            <canvas id="progress-canvas" hidden></canvas>
+            <div class="compare" id="compare" hidden>
+              <img id="after" class="layer" alt="Foto ampliada" draggable="false" />
+              <div class="layer before-clip" id="before-clip">
+                <img id="before" class="layer" alt="" draggable="false" />
+              </div>
+              <div
+                class="divider"
+                id="divider"
+                role="slider"
+                tabindex="0"
+                aria-label="Comparar original y ampliada"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="50"
+              >
+                <span class="knob" aria-hidden="true"></span>
+              </div>
+              <span class="tag tag-left" aria-hidden="true">Original</span>
+              <span class="tag tag-right" aria-hidden="true" id="tag-right">4K</span>
+            </div>
+            <div class="bar" id="bar" hidden><span id="bar-fill"></span></div>
+          </div>
+          <figcaption class="visually-hidden" id="frame-caption"></figcaption>
+        </figure>
+
+        <div class="zoom" id="zoom" hidden>
+          <button type="button" class="icon-button" data-zoom="out" aria-label="Alejar">−</button>
+          <button type="button" class="icon-button wide" data-zoom="fit">Ajustar</button>
+          <button type="button" class="icon-button wide" data-zoom="actual">100 %</button>
+          <button type="button" class="icon-button" data-zoom="in" aria-label="Acercar">+</button>
+        </div>
+      </section>
+
+      <div class="controls">
+        <form id="settings" novalidate>
+          <fieldset class="group">
+            <legend>Tamaño final</legend>
+            <div class="segmented" id="sizes">
+              <label><input type="radio" name="size" value="4k" checked /><span>4K</span></label>
+              <label><input type="radio" name="size" value="4k-uhd" /><span>4K UHD</span></label>
+              <label><input type="radio" name="size" value="x2" /><span>×2</span></label>
+              <label><input type="radio" name="size" value="x4" /><span>×4</span></label>
+            </div>
+            <p class="note" id="size-note">El lado largo queda en 3840 px y se respeta la proporción de tu foto.</p>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend>Tipo de foto</legend>
+            <div class="options" id="models"></div>
+          </fieldset>
+
+          <details class="more">
+            <summary>Más ajustes</summary>
+            <div class="more-body">
+              <label class="check">
+                <input type="checkbox" name="colors" checked />
+                <span><strong>Mantener los colores del original</strong> Corrige cualquier desvío de color o brillo de la IA.</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="metadata" checked />
+                <span><strong>Conservar los datos de la foto</strong> Fecha, cámara y ubicación (EXIF).</span>
+              </label>
+              <label class="range">
+                <span class="range-label">Nitidez extra <output id="sharpen-out">Ninguna</output></span>
+                <input type="range" name="sharpen" min="0" max="100" step="5" value="0" />
+              </label>
+              <div class="format">
+                <span class="range-label">Formato</span>
+                <label><input type="radio" name="format" value="png" checked /> PNG, sin pérdida</label>
+                <label><input type="radio" name="format" value="jpeg" /> JPG, archivo más liviano</label>
+              </div>
+            </div>
+          </details>
+        </form>
+
+        <!-- La acción principal queda siempre a la vista al desplazarse -->
+        <div class="dock">
+          <div class="actions">
+            <button type="button" class="button primary" id="run" disabled>Ampliar a 4K</button>
+            <button type="button" class="button secondary" id="cancel" hidden>Cancelar</button>
+            <a class="button primary" id="download" hidden>Descargar</a>
+            <button type="button" class="button secondary" id="another" hidden>Otra foto</button>
+          </div>
+          <div class="status" id="status">
+            <p id="status-text">Primero elige una foto.</p>
+            <p class="device" id="device"></p>
+          </div>
+          <p class="error" id="error" role="alert" hidden></p>
+          <p class="visually-hidden" id="announcer" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </main>
+
+    <section class="explainer" id="como-funciona">
+      <h2>Cómo funciona</h2>
+      <ol class="steps">
+        <li>
+          <h3>Tu foto se abre en tu navegador</h3>
+          <p>No hay servidor que la reciba: todo ocurre en tu computadora o tu celular.</p>
+        </li>
+        <li>
+          <h3>La IA la amplía por bloques</h3>
+          <p>
+            Un modelo Swin2SR procesa la imagen en partes pequeñas usando tu tarjeta gráfica (o tu procesador si no
+            hay una disponible). La primera vez se descarga el modelo y luego queda guardado.
+          </p>
+        </li>
+        <li>
+          <h3>Se compara con el original</h3>
+          <p>
+            Los colores y tonos se ajustan para coincidir con tu foto, sin recortes ni deformaciones. Descargas el
+            resultado en PNG sin pérdida, con sus datos EXIF.
+          </p>
+        </li>
+      </ol>
+      <div class="facts">
+        <div>
+          <h3>Lo que la IA puede y no puede hacer</h3>
+          <p>
+            Ninguna herramienta recupera detalles que la cámara nunca captó. La IA estima el detalle más probable:
+            bordes más limpios, menos ruido y menos bloques de compresión. Por eso usamos modelos que priorizan la
+            fidelidad en lugar de inventar texturas.
+          </p>
+        </div>
+        <div>
+          <h3>Privacidad</h3>
+          <p>
+            Sin cuentas, sin anuncios y sin rastreo. Lo único que se descarga es el modelo de IA desde Hugging Face y
+            el motor desde jsDelivr.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>
+        Foto4K es de código abierto (licencia MIT). Modelos Swin2SR de Conde et al., Universidad de Würzburg (licencia
+        Apache 2.0), con Transformers.js y ONNX Runtime.
+      </p>
+    </footer>
+  </body>
+</html>
